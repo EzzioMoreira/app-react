@@ -1,0 +1,26 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: lab-actions
+spec:
+  concurrencyPolicy: Allow
+  failedJobsHistoryLimit: 3
+  schedule: "0 22 * * 1-5"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: lab-actions
+            image: 520044189785.dkr.ecr.us-east-1.amazonaws.com/lab-actions:a473b033
+            envFrom:
+            - secretRef:
+                name: lab-actions-secret
+          restartPolicy: OnFailure
+          nodeSelector:
+            eks.amazonaws.com/nodegroup: eks-tool-node-group-stage
+          tolerations:
+          - key: "tool"
+            operator: "Exists"
+            effect: "NoSchedule"
+      backoffLimit: 3
