@@ -7,11 +7,12 @@ on:
 jobs:
   
   build-push:
-    
     name: Deploy stage
     runs-on: ubuntu-20.04
 
     steps:
+    - name: Check out code
+      uses: actions/checkout@v2
     
     - name: Create pull request
       uses: repo-sync/pull-request@v2
