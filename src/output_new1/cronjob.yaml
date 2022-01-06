@@ -12,7 +12,7 @@ spec:
         spec:
           containers:
           - name: lab-actions
-            image: $ECR_REGISTRY/$ECR_REPOSITORY/lab-actions:6cefe0de
+            image: $ECR_REGISTRY/$ECR_REPOSITORY/lab-actions:5bc6bade
             envFrom:
             - secretRef:
                 name: lab-actions-secret
