@@ -1,8 +1,5 @@
 name: Deploy stage
-on:
-  push:
-    branches:
-      - "stage"
+on: push
 
 jobs:
   
