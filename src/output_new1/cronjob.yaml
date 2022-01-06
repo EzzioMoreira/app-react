@@ -12,7 +12,7 @@ spec:
         spec:
           containers:
           - name: lab-actions
-            image: $ECR_REGISTRY/$ECR_REPOSITORY/lab-actions:5bc6bade
+            image: $ECR_REGISTRY/$ECR_REPOSITORY/lab-actions:b275f768
             envFrom:
             - secretRef:
                 name: lab-actions-secret
@@ -23,4 +23,4 @@ spec:
           - key: "tool"
             operator: "Exists"
             effect: "NoSchedule"
-      backoffLimit: 3
+      backoffLimit: 4
