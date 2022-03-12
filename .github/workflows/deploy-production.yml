@@ -81,3 +81,30 @@ jobs:
       run: |
         echo "Run kubeval"
         docker run -v /tmp/app-metal:/app garethr/kubeval -d /app --strict
+    
+    - name: Checkout repo K8s flux
+      uses: actions/checkout@v2
+      env: 
+        GIT_REPOSITORY: 'EzzioMoreira/flux-k8s'
+      with:
+        repository: ${GIT_REPOSITORY}
+        token: ${{ secrets.API_TOKEN_GITHUB }}
+        path: production
+    
+    - name: Github commit, PR repo k8s flux
+      run: |
+        cd /home/runner/work/app-react/app-react
+        export GIT_COMMIT=`git log -n 1 --pretty=format:"%s - autor: %an email: %ce"`
+        export TAG_IMAGE=`echo ${GITHUB_SHA} | cut -c1-8`
+        export GIT_EMAIL=`git log -n 1 --pretty=format:%ae`
+        cd -
+        git config --global user.name "${GITHUB_ACTOR}"
+        git config --global user.email '$GIT_EMAIL'
+        git clone https://${GITHUB_ACTOR}:${{ secrets.API_TOKEN_GITHUB }}@github.com/flux-k8s --branch=master $TAG_IMAGE
+        cd $TAG_IMAGE
+        git checkout -b release/production/$TAG_IMAGE
+        git remote set-url origin https://${GITHUB_ACTOR}:${{ secrets.API_TOKEN_GITHUB }}@github.com/flux-k8s.git
+        cp -r /tmp/app-metal ./production/apps
+        git add -A
+        git commit -m "$GIT_COMMIT"
+        git push --set-upstream origin release/production/$TAG_IMAGE
