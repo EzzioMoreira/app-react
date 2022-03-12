@@ -37,19 +37,37 @@ jobs:
    steps:
    - name: Checkout code
      uses: actions/checkout@v2
+     run: |
+       export DOCKER_REGISTRY=ezmo/webapp
    
    - name: Login to Docker Hub
-     uses: docker/login-action@v1
-     with: 
-      username: ${{ secrets.DOCKERHUB_USERNAME }}
-      password: ${{ secrets.DOCKERHUB_TOKEN }}
-     id: login-docker
-     env:
-       DOCKER_REGISTRY: public.ecr.aws/o3h3e6d4
-       DOCKER_REPOSITORY: webapp
-     run: |
-       docker build -t $DOCKER_REGISTRY/$DOCKER_REPOSITORY:$(echo ${GITHUB_SHA} | cut -c1-8) .
-       docker push $DOCKER_REGISTRY/$DOCKER_REPOSITORY:$(echo ${GITHUB_SHA} | cut -c1-8) 
+     uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+     with:
+       registry: ${DOCKER_REGISTRY}
+       username: ${{ secrets.DOCKERHUB_USERNAME }}
+       password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+   - name: Extract metadata (tags, labels) for Docker
+     id: meta
+     uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+     with:
+       images: ${DOCKER_REGISTRY}
+
+   - name: Build and push Docker image
+     uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+     with:
+       context: .
+       push: true
+       tags: $(echo ${GITHUB_SHA} | cut -c1-8)
+
+#     id: login-docker
+#     env:
+#       DOCKER_REGISTRY: public.ecr.aws/o3h3e6d4
+#       DOCKER_REPOSITORY: webapp
+#     run: |
+#       docker build -t $DOCKER_REGISTRY/$DOCKER_REPOSITORY:$(echo ${GITHUB_SHA} | cut -c1-8) .
+#       docker push $DOCKER_REGISTRY/$DOCKER_REPOSITORY:$(echo ${GITHUB_SHA} | cut -c1-8) 
+
   GitOps:
     runs-on: ubuntu-20.04
     name: GitOps
