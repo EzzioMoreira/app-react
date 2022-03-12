@@ -54,3 +54,31 @@ jobs:
      run: |
        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$(echo ${GITHUB_SHA} | cut -c1-8) .
        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$(echo ${GITHUB_SHA} | cut -c1-8) 
+  GitOps:
+    runs-on: ubuntu-20.04
+    name: GitOps
+    environment: production
+    needs: [build-push]
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
+    steps:
+    - name: Checkout Manifest
+      uses: actions/checkout@v2
+
+    - name: Build manifest to GitOps
+      env:
+        ECR_REGISTRY: 520044189785.dkr.ecr.us-west-2.amazonaws.com/webapp
+        REPO_NAME: webapp
+        REPLICAS: 2
+      run: |
+        echo "Preenchendo manifesto"
+        export TAG_IMAGE=`echo ${GITHUB_SHA} | cut -c1-8`
+        mkdir /tmp/app-react
+        envsubst <./manifesto/deployment.yaml > /tmp/app-react/deployment.yaml
+    
+    - name: Validate kubernetes manifests using Kubeval
+      run: |
+        echo "Run kubeval"
+        docker run -v /tmp/app-react:/app garethr/kubeval -d /app --strict
