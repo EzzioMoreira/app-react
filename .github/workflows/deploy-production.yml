@@ -87,7 +87,7 @@ jobs:
       env: 
         GIT_REPOSITORY: 'EzzioMoreira/flux-k8s'
       with:
-        repository: ${GIT_REPOSITORY}
+        repository: $GIT_REPOSITORY
         token: ${{ secrets.API_TOKEN_GITHUB }}
         path: production
     
