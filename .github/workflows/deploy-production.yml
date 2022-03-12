@@ -1,0 +1,56 @@
+name: Deploy production
+on:
+  push:
+    branches:
+      - "main"
+    paths-ignore:
+      - '**/README.md'
+#      - '**/.github/**'
+#      - '**/.gitignore'
+jobs:
+  kubeval-lint: 
+     runs-on: ubuntu-20.04
+     name: Kubeval tools
+     environment: production
+
+     steps:
+     - name: Checkout code
+       uses: actions/checkout@v2
+
+     - name: Validate template kubernetes manifests using Kubeval
+       uses: stefanprodan/kube-tools@v1.7.1
+       with:
+         kubeval: v0.16.1
+         command: |
+           hostname
+           echo "Run kubeval"
+           kubeval -d manifestos --strict --ignore-missing-schemas
+  build-push:
+   runs-on: ubuntu-20.04
+   name: Build ECR image
+   environment: production
+   needs: [kubeval-lint]
+   if: |
+     always() &&
+     !contains(needs.*.result, 'failure') &&
+     !contains(needs.*.result, 'cancelled')
+   steps:
+   - name: Checkout code
+     uses: actions/checkout@v2
+   
+   - name: Configure AWS credentials
+     uses: aws-actions/configure-aws-credentials@v1
+     with:
+       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+       aws-region: ${{ secrets.AWS_REGION }}
+   - name: Login to Amazon ECR
+     id: login-ecr
+     uses: aws-actions/amazon-ecr-login@v1
+   - name: Build, tag, and push image to Amazon ECR
+     env:
+       ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+       ECR_REPOSITORY: webapp
+     run: |
+       docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$(echo ${GITHUB_SHA} | cut -c1-8) .
+       docker push $ECR_REGISTRY/$ECR_REPOSITORY:$(echo ${GITHUB_SHA} | cut -c1-8) 
