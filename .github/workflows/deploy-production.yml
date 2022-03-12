@@ -87,7 +87,7 @@ jobs:
       env: 
         GIT_REPOSITORY: 'EzzioMoreira/flux-k8s'
       with:
-        repository: $GIT_REPOSITORY
+        repository: 'EzzioMoreira/flux-k8s'
         token: ${{ secrets.API_TOKEN_GITHUB }}
         path: production
     
@@ -100,10 +100,10 @@ jobs:
         cd -
         git config --global user.name "${GITHUB_ACTOR}"
         git config --global user.email '$GIT_EMAIL'
-        git clone https://${GITHUB_ACTOR}:${{ secrets.API_TOKEN_GITHUB }}@github.com/flux-k8s --branch=master $TAG_IMAGE
+        git clone https://${GITHUB_ACTOR}:${{ secrets.API_TOKEN_GITHUB }}@github.com/${GIT_REPOSITORY} --branch=master $TAG_IMAGE
         cd $TAG_IMAGE
         git checkout -b release/production/$TAG_IMAGE
-        git remote set-url origin https://${GITHUB_ACTOR}:${{ secrets.API_TOKEN_GITHUB }}@github.com/flux-k8s.git
+        git remote set-url origin https://${GITHUB_ACTOR}:${{ secrets.API_TOKEN_GITHUB }}@github.com/${GIT_REPOSITORY}.git
         cp -r /tmp/app-metal ./production/apps
         git add -A
         git commit -m "$GIT_COMMIT"
