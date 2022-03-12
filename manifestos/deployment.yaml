@@ -6,7 +6,7 @@ metadata:
   labels:
     app: ${REPO_NAME}-demo-flux
 spec:
-  replicas: ${REPLICAS}
+  replicas: 1
   selector:
     matchLabels:
       app: ${REPO_NAME}-demo-flux

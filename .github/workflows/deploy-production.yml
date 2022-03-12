@@ -71,7 +71,6 @@ jobs:
       env:
         ECR_REGISTRY: 520044189785.dkr.ecr.us-west-2.amazonaws.com/webapp
         REPO_NAME: webapp
-        REPLICAS: 2
       run: |
         echo "Preenchendo manifesto"
         export TAG_IMAGE=`echo ${GITHUB_SHA} | cut -c1-8`
