@@ -74,10 +74,10 @@ jobs:
       run: |
         echo "Preenchendo manifesto"
         export TAG_IMAGE=`echo ${GITHUB_SHA} | cut -c1-8`
-        mkdir /tmp/app-react
-        envsubst <./manifesto/deployment.yaml > /tmp/app-react/deployment.yaml
+        mkdir /tmp/app-metal
+        envsubst <./manifestos/deployment.yaml > /tmp/app-metal/deployment.yaml
     
     - name: Validate kubernetes manifests using Kubeval
       run: |
         echo "Run kubeval"
-        docker run -v /tmp/app-react:/app garethr/kubeval -d /app --strict
+        docker run -v /tmp/app-metal:/app garethr/kubeval -d /app --strict
