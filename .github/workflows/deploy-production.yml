@@ -104,7 +104,7 @@ jobs:
         cd $TAG_IMAGE
         git checkout -b release/production/$TAG_IMAGE
         git remote set-url origin https://EzzioMoreira:${{ secrets.API_TOKEN_GITHUB }}@github.com/EzzioMoreira/flux-k8s.git
-        cp -r /tmp/app-metal ./production/apps
+        cp -r /tmp/app-metal ./clusters/production/apps
         git add -A
         git commit -m "$GIT_COMMIT"
         git push --set-upstream origin release/production/$TAG_IMAGE
