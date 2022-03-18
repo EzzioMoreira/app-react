@@ -20,7 +20,7 @@ RUN go build -o /docker-gs-ping
 # must be supplied to the docker command.
 EXPOSE 8080
 
-# (Optional) environment variable that our dockerised
+
 # application can make use of. The value of environment
 # variables can also be set via parameters supplied
 # to the docker command on the command line.
